@@ -9,8 +9,8 @@ import {
 	Platform,
 	I18nManager,
 	EmitterSubscription,
+	Clipboard,
 } from 'react-native';
-import Clipboard from '@react-native-community/clipboard';
 import styles from './styles';
 import { isAutoFillSupported } from './helpers/device';
 import { codeToArray } from './helpers/codeToArray';
@@ -104,26 +104,25 @@ export default class OTPInputView extends Component<InputProps, OTPInputViewStat
 	checkPinCodeFromClipBoard = () => {
 		const { pinCount, onCodeFilled } = this.props;
 		const regexp = new RegExp(`^\\d{${pinCount}}$`);
-		if (Clipboard && Clipboard.hasString()) {
-			Clipboard.getString()
-				.then((code) => {
-					if (this.hasCheckedClipBoard && regexp.test(code) && this.clipBoardCode !== code) {
-						this.setState(
-							{
-								digits: code.split(''),
-							},
-							() => {
-								this.blurAllFields();
-								this.notifyCodeChanged();
-								onCodeFilled && onCodeFilled(code);
-							}
-						);
-					}
-					this.clipBoardCode = code;
-					this.hasCheckedClipBoard = true;
-				})
-				.catch(() => {});
-		}
+
+		Clipboard.getString()
+			.then((code) => {
+				if (this.hasCheckedClipBoard && regexp.test(code) && this.clipBoardCode !== code) {
+					this.setState(
+						{
+							digits: code.split(''),
+						},
+						() => {
+							this.blurAllFields();
+							this.notifyCodeChanged();
+							onCodeFilled && onCodeFilled(code);
+						}
+					);
+				}
+				this.clipBoardCode = code;
+				this.hasCheckedClipBoard = true;
+			})
+			.catch(() => {});
 	};
 
 	private handleChangeText = (index: number, text: string) => {
